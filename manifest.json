@@ -1,0 +1,233 @@
+{
+  "name": "semrush [BETA]",
+  "tags": [
+    "outgoing",
+    "oneColumn",
+    "batch",
+    "batch-accounts",
+    "smart-notifier"
+  ],
+  "description": "Hull Connector for semrush",
+  "readme": "readme.md",
+  "tabs": [],
+  "version": "1.0.0",
+  "source": "semrush",
+  "logo": "logo.png",
+  "picture": "picture.png",
+  "ui": false,
+  "settings": [],
+  "private_settings": [{
+      "name": "api_key",
+      "type": "string",
+      "title": "API Key",
+      "description": "The API Key to authenticate."
+    },
+    {
+      "name": "account_synchronized_segments_traffic_summary",
+      "title": "Account Filter",
+      "description": "Enrich Hull Accounts when they are part of one of these segments.",
+      "type": "array",
+      "format": "accountSegment",
+      "default": []
+    },
+    {
+      "name": "account_attributes_incoming_traffic_summary",
+      "title": "Incoming Mapping",
+      "description": "Define the enriched fields to store on the Hull Account profile.",
+      "type": "array",
+      "format": "accountTraitMapping",
+      "options": {
+        "direction": "incoming",
+        "showOverwriteToggle": true,
+        "placeholder": "Semrush Field",
+        "allowCreate": true,
+        "loadOptions": "/meta/fields/traffic_summary/incoming",
+        "source": "semrush"
+      },
+      "default": [
+        {
+          "hull": "semrush/domain",
+          "overwrite": true,
+          "readOnly": true,
+          "service": "domain"
+        }, {
+          "hull": "semrush/report_date",
+          "overwrite": true,
+          "readOnly": true,
+          "service": "display_date"
+        },
+        {
+          "hull": "semrush/country",
+          "overwrite": true,
+          "service": "country"
+        },
+        {
+          "hull": "semrush/total_rank",
+          "overwrite": true,
+          "service": "total_rank"
+        },
+        {
+          "hull": "semrush/desktop_rank",
+          "overwrite": true,
+          "service": "desktop_rank"
+        },
+        {
+          "hull": "semrush/mobile_rank",
+          "overwrite": true,
+          "service": "mobile_rank"
+        },
+        {
+          "hull": "semrush/desktop_share",
+          "overwrite": true,
+          "service": "desktop_share"
+        },
+        {
+          "hull": "semrush/mobile_share",
+          "overwrite": true,
+          "service": "mobile_share"
+        },
+        {
+          "hull": "semrush/total_visits",
+          "overwrite": true,
+          "service": "total_visits"
+        },
+        {
+          "hull": "semrush/mobile_visits",
+          "overwrite": true,
+          "service": "mobile_visits"
+        },
+        {
+          "hull": "semrush/desktop_visits",
+          "overwrite": true,
+          "service": "desktop_visits"
+        },
+        {
+          "hull": "semrush/total_unique_visitors",
+          "overwrite": true,
+          "service": "total_unique_visitors"
+        },
+        {
+          "hull": "semrush/mobile_unique_visitors",
+          "overwrite": true,
+          "service": "mobile_unique_visitors"
+        },
+        {
+          "hull": "semrush/desktop_unique_visitors",
+          "overwrite": true,
+          "service": "desktop_unique_visitors"
+        },
+        {
+          "hull": "semrush/total_pages_per_visit",
+          "overwrite": true,
+          "service": "total_pages_per_visit"
+        },
+        {
+          "hull": "semrush/mobile_pages_per_visit",
+          "overwrite": true,
+          "service": "mobile_pages_per_visit"
+        },
+        {
+          "hull": "semrush/desktop_pages_per_visit",
+          "overwrite": true,
+          "service": "desktop_pages_per_visit"
+        },
+        {
+          "hull": "semrush/total_avg_visit_duration",
+          "overwrite": true,
+          "service": "total_avg_visit_duration"
+        },
+        {
+          "hull": "semrush/mobile_avg_visit_duration",
+          "overwrite": true,
+          "service": "mobile_avg_visit_duration"
+        },
+        {
+          "hull": "semrush/desktop_avg_visit_duration",
+          "overwrite": true,
+          "service": "desktop_avg_visit_duration"
+        },
+        {
+          "hull": "semrush/total_bounce_rate",
+          "overwrite": true,
+          "service": "total_bounce_rate"
+        },
+        {
+          "hull": "semrush/mobile_bounce_rate",
+          "overwrite": true,
+          "service": "mobile_bounce_rate"
+        },
+        {
+          "hull": "semrush/desktop_bounce_rate",
+          "overwrite": true,
+          "service": "desktop_bounce_rate"
+        }
+      ]
+    },
+    {
+      "name": "account_synchronized_segments_backlinks_categories",
+      "title": "Account Filter",
+      "description": "Enrich Hull Accounts when they are part of one of these segments.",
+      "type": "array",
+      "format": "accountSegment",
+      "default": []
+    },
+    {
+      "name": "account_attributes_incoming_backlinks_categories",
+      "title": "Incoming Mapping",
+      "description": "Define the enriched fields to store on the Hull Account profile.",
+      "type": "array",
+      "format": "accountTraitMapping",
+      "options": {
+        "direction": "incoming",
+        "showOverwriteToggle": true,
+        "placeholder": "Semrush Field",
+        "allowCreate": true,
+        "loadOptions": "/meta/fields/backlinks_categories/incoming",
+        "source": "semrush"
+      },
+      "default": [
+        {
+          "hull": "semrush/category_names",
+          "overwrite": true,
+          "readOnly": true,
+          "service": "categories[].category_name"
+        }, {
+          "hull": "semrush/categories_detailed",
+          "overwrite": true,
+          "service": "categories"
+        }
+      ]
+    }
+  ],
+  "json": [],
+  "schedules": [{
+    "url": "/status",
+    "type": "interval",
+    "value": "30"
+  }],
+  "subscriptions": [{
+    "url": "/smart-notifier"
+  }],
+  "settings_sections": [{
+      "title": "Authentication",
+      "description": "Configure the parameters to authorize the semrush API.",
+      "properties": ["private_settings.api_key"]
+    },
+    {
+      "title": "Traffic Overview",
+      "description": "Define which accounts are analyzed with the traffic overview report.",
+      "properties": [
+        "private_settings.account_synchronized_segments_traffic_summary",
+        "private_settings.account_attributes_incoming_traffic_summary"
+      ]
+    },
+    {
+      "title": "Backlinks Categories",
+      "description": "Define which accounts are analyzed with the backlinks categories report.",
+      "properties": [
+        "private_settings.account_synchronized_segments_backlinks_categories",
+        "private_settings.account_attributes_incoming_backlinks_categories"
+      ]
+    }
+  ]
+}

@@ -24,7 +24,7 @@
     },
     {
       "name": "account_synchronized_segments_traffic_summary",
-      "title": "Account Filter",
+      "title": "Account Filter Traffic Summary",
       "description": "Enrich Hull Accounts when they are part of one of these segments.",
       "type": "array",
       "format": "accountSegment",
@@ -164,8 +164,15 @@
       ]
     },
     {
+      "name": "batch_enabled_traffic_summary",
+      "title": "Enable for batch",
+      "description": "Run the traffic summary report on batch operations",
+      "type": "boolean",
+      "default": false
+    },
+    {
       "name": "account_synchronized_segments_backlinks_categories",
-      "title": "Account Filter",
+      "title": "Account Filter Backlinks Categories",
       "description": "Enrich Hull Accounts when they are part of one of these segments.",
       "type": "array",
       "format": "accountSegment",
@@ -197,6 +204,13 @@
           "service": "categories"
         }
       ]
+    },
+    {
+      "name": "batch_enabled_backlinks_categories",
+      "title": "Enable for batch",
+      "description": "Run the backlinks categories report on batch operations",
+      "type": "boolean",
+      "default": false
     }
   ],
   "json": [],
@@ -206,7 +220,22 @@
     "value": "30"
   }],
   "subscriptions": [{
-    "url": "/smart-notifier"
+    "url": "/smart-notifier",
+    "conditions": {
+      "channels": {
+        "only": ["account:update"]
+      },
+      "segments": {
+        "account:update": [
+          "private_settings.account_synchronized_segments_traffic_summary",
+          "private_settings.account_synchronized_segments_backlinks_categories"
+        ]
+      }
+    },
+    "channels": [{
+      "channel": "account:update",
+      "handler": "account_update"
+    }]
   }],
   "settings_sections": [{
       "title": "Authentication",
@@ -214,11 +243,12 @@
       "properties": ["private_settings.api_key"]
     },
     {
-      "title": "Traffic Overview",
-      "description": "Define which accounts are analyzed with the traffic overview report.",
+      "title": "Traffic Summary",
+      "description": "Define which accounts are analyzed with the traffic summary report.",
       "properties": [
         "private_settings.account_synchronized_segments_traffic_summary",
-        "private_settings.account_attributes_incoming_traffic_summary"
+        "private_settings.account_attributes_incoming_traffic_summary",
+        "private_settings.batch_enabled_traffic_summary"
       ]
     },
     {
@@ -226,7 +256,8 @@
       "description": "Define which accounts are analyzed with the backlinks categories report.",
       "properties": [
         "private_settings.account_synchronized_segments_backlinks_categories",
-        "private_settings.account_attributes_incoming_backlinks_categories"
+        "private_settings.account_attributes_incoming_backlinks_categories",
+        "private_settings.batch_enabled_backlinks_categories"
       ]
     }
   ]

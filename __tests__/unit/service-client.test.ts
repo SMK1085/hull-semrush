@@ -43,11 +43,6 @@ describe("ServiceClient", () => {
         target: "searchenginejournal.com",
         target_type: "root_domain",
       };
-      const qsObject = {
-        type: "backlinks_categories",
-        ...request,
-        key: API_KEY,
-      };
       const opts = {
         apiKey: API_KEY,
       };
@@ -55,7 +50,7 @@ describe("ServiceClient", () => {
       const client = new ServiceClient(opts);
 
       nock(API_BASE)
-        .get(`/analytics/v1/?${qs.stringify(qsObject)}`)
+        .get(/\/analytics\/v1\/.*$/)
         .reply(
           200,
           `category_name;rating\n/Internet & Telecom/Web Services/Search Engine Optimization & Marketing;0.931905\n/Internet & Telecom/Web Services/Affiliate Programs;0.880989\n/Business & Industrial/Advertising & Marketing/Marketing;0.872495\n/Internet & Telecom/Search Engines;0.821398\n/Business & Industrial/Advertising & Marketing/Brand Management;0.813207`,
@@ -104,11 +99,6 @@ describe("ServiceClient", () => {
         target: "searchenginejournal.com",
         target_type: "root_domain",
       };
-      const qsObject = {
-        type: "backlinks_categories",
-        ...request,
-        key: API_KEY,
-      };
       const opts = {
         apiKey: API_KEY,
       };
@@ -116,7 +106,7 @@ describe("ServiceClient", () => {
       const client = new ServiceClient(opts);
 
       nock(API_BASE)
-        .get(`/analytics/v1/?${qs.stringify(qsObject)}`)
+        .get(/\/analytics\/v1\/.*$/)
         .reply(200, `ERROR 120 :: WRONG KEY - ID PAIR`, {
           "content-type": "text/plain; charset=utf-8",
         });

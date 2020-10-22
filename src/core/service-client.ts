@@ -7,7 +7,7 @@ import axios, { AxiosError } from "axios";
 import { ApiUtil } from "../utils/api-util";
 import { parse } from "papaparse";
 import qs from "querystring";
-import { pickBy, identity } from "lodash";
+import { pickBy, identity, forEach } from "lodash";
 
 const API_BASE = "https://api.semrush.com";
 
@@ -64,7 +64,10 @@ export class ServiceClient {
   > {
     const url = `${API_BASE}/analytics/v1/?${this.createQueryString(
       "backlinks_categories",
-      params,
+      {
+        ...params,
+        export_columns: params.export_columns.join(","),
+      },
     )}`;
     const method: Type$ApiMethod = "get";
 
@@ -106,7 +109,7 @@ export class ServiceClient {
       throw new Error(errorMessage);
     }
 
-    var parseResult = parse(csvString, {
+    var parseResult = parse(csvString.trimEnd(), {
       delimiter: ";",
       header: true,
       dynamicTyping: true,

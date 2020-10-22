@@ -76,6 +76,37 @@ export namespace semrush_v3 {
 
   export type Type$BacklinksCategoriesColumn = "category_name" | "rating";
 
+  export type Type$OverviewExportColumn =
+    | "Db"
+    | "Dt"
+    | "Dn"
+    | "Rk"
+    | "Or"
+    | "Ot"
+    | "Oc"
+    | "Ad"
+    | "At"
+    | "Ac"
+    | "Sh"
+    | "Sv"
+    | "FKn"
+    | "FPn";
+
+  export type Type$OverviewSort =
+    | "rk_asc"
+    | "rk_desc"
+    | "or_asc"
+    | "or_desc"
+    | "ot_asc"
+    | "ot_desc"
+    | "oc_asc"
+    | "oc_desc"
+    | "ad_asc"
+    | "ad_desc"
+    | "at_asc"
+    | "at_desc"
+    | "ac_asc"
+    | "ac_desc";
   /**
    * Refer to https://www.semrush.com/api-analytics/#ta
    */
@@ -92,6 +123,9 @@ export namespace semrush_v3 {
     [key: string]: string | number;
   }
 
+  /**
+   * Refer to https://www.semrush.com/api-analytics/#backlinks_categories
+   */
   export interface Schema$BacklinksCategoriesRequest {
     target: string;
     target_type: "root_domain";
@@ -101,6 +135,26 @@ export namespace semrush_v3 {
   export interface Schema$BacklinksCategories {
     category_name: string;
     rating: number;
+  }
+
+  /**
+   * Refer to https://www.semrush.com/api-analytics/#domain_ranks
+   */
+  export interface Schema$DomainRankRequest {
+    domain: string;
+    database: string;
+    display_limit?: number;
+    display_offset?: number;
+    export_escape?: string; // Set to "1" to wrap columns in double quotation marks
+    display_date?: string; // date in format "YYYYMM15"
+    export_columns?: Type$OverviewExportColumn[];
+    display_sort?: Type$OverviewSort;
+  }
+
+  export interface Schema$DomainRank {
+    Database: string;
+    Domain: string;
+    [key: string]: string | number;
   }
 }
 

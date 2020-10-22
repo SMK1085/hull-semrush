@@ -12,6 +12,7 @@ import {
   Type$SupportedAnalyticsType,
   Schema$OutgoingOperationEnvelopesFiltered,
   Schema$OutgoingOperationEnvelope,
+  MAPPING_DOMAINRANKS_V3,
 } from "./connector";
 import IHullClient from "../types/hull-client";
 import { isNil, cloneDeep, forEach, set } from "lodash";
@@ -19,14 +20,9 @@ import {
   STATUS_SETUPREQUIRED_NOAPIKEY,
   ERROR_UNHANDLED_GENERIC,
 } from "./messages";
-import { ConnectorRedisClient } from "../utils/redis-client";
 import IHullAccountUpdateMessage from "../types/account-update-message";
 import asyncForEach from "../utils/async-foreach";
-import {
-  OutgoingOperationEnvelope,
-  Schema$ApiResultObject,
-  semrush_v3,
-} from "./service-objects";
+import { Schema$ApiResultObject } from "./service-objects";
 import { FieldsSchema } from "../types/fields-schema";
 import { AxiosError } from "axios";
 import { HullUtil } from "../utils/hull-util";
@@ -112,6 +108,7 @@ export class SyncAgent {
       const supportedAnalyticTypes: Type$SupportedAnalyticsType[] = [
         "backlinks_categories",
         "traffic_summary",
+        "domain_ranks",
       ];
       let totalEnvelopesForAnalytics = 0;
       forEach(supportedAnalyticTypes, (analyticsType) => {
@@ -161,6 +158,7 @@ export class SyncAgent {
         traffic_summary: serviceClient.runTrafficSummaryReport.bind(
           serviceClient,
         ),
+        domain_ranks: serviceClient.runDomainRanksReport.bind(serviceClient),
       };
 
       // TODO: Process analytics
@@ -259,6 +257,9 @@ export class SyncAgent {
         break;
       case "traffic_summary":
         fieldSchema.options = MAPPINGS_TRAFFICSUMMARY_V3;
+        break;
+      case "domain_ranks":
+        fieldSchema.options = MAPPING_DOMAINRANKS_V3;
         break;
       default:
         fieldSchema.error = `No metadata for object type '${objectType}' and direction '${direction}' available.`;

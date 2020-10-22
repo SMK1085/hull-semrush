@@ -4,6 +4,7 @@ import manifest from "../../manifest.json";
 export const IMPLEMENTED_ANALYTICSTYPES: Type$SupportedAnalyticsType[] = [
   "backlinks_categories",
   "traffic_summary",
+  "domain_ranks",
 ];
 
 // Semrush API
@@ -21,4 +22,7 @@ export const APP_SETTINGS_MAPPINGS_TRAFFIC_SUMMARY_DEFAULT = manifest.private_se
 )!.default;
 export const APP_SETTINGS_MAPPINGS_BACKLINGS_CATEGORIES_DEFAULT = manifest.private_settings.find(
   (s) => s.name === "account_attributes_incoming_backlinks_categories",
+)!.default;
+export const APP_SETTINGS_MAPPINGS_DOMAIN_RANKS_DEFAULT = manifest.private_settings.find(
+  (s) => s.name === "account_attributes_incoming_domain_ranks",
 )!.default;

@@ -1,4 +1,4 @@
-import { first, forEach, get, isNil, pick, set } from "lodash";
+import { first, forEach, get, isArray, isNil, pick, set } from "lodash";
 import {
   Schema$PrivateSettings,
   Schema$MapIncomingParameters,
@@ -38,10 +38,12 @@ export class MappingUtil {
     this.registeredOperationsIncoming = {
       traffic_summary: this.mapIncomingTrafficSummary.bind(this),
       backlinks_categories: this.mapIncomingBacklinksCategories.bind(this),
+      domain_ranks: this.mapIncomingDomainRanks.bind(this),
     };
     this.registeredOperationsOutgoing = {
       traffic_summary: this.mapOutgoingTrafficSummary.bind(this),
       backlinks_categories: this.mapOutgoingBacklinksCategories.bind(this),
+      domain_ranks: this.mapOutgoingDomainRanks.bind(this),
     };
   }
 
@@ -270,6 +272,81 @@ export class MappingUtil {
     return result;
   }
 
+  private mapIncomingDomainRanks(
+    params: Schema$MapIncomingParameters,
+  ): Schema$MapIncomingResult[] {
+    const result: Schema$MapIncomingResult[] = [];
+
+    const envelope = first(
+      params.hullData as any[],
+    ) as Schema$OutgoingOperationEnvelope<IHullAccountUpdateMessage, unknown>;
+
+    const ident = pick(envelope.message.account, [
+      "id",
+      "external_id",
+      "domain",
+    ]);
+    if (
+      (get(envelope.message.account, "anonymous_ids", []) as string[]).length >
+      0
+    ) {
+      set(
+        ident,
+        "anonymous_id",
+        first(get(envelope.message.account, "anonymous_ids", []) as string[]),
+      );
+    }
+    const attributes = {};
+    const pseudoObject = isArray(params.data)
+      ? first(params.data as any[])
+      : params.data;
+
+    // Map the customer defined columns
+    forEach(
+      this.appSettings.account_attributes_incoming_domain_ranks,
+      (mapping) => {
+        if (!isNil(mapping.hull) && !isNil(mapping.service)) {
+          const expression = jsonata(`\`${mapping.service!}\``);
+          let result = expression.evaluate(pseudoObject);
+          if (typeof result === "string" && result === "") {
+            result = null;
+          }
+          if (result === undefined) {
+            result = null;
+          }
+
+          if (mapping.overwrite === false && result === null) {
+            // TODO: Add logging. This is a no-op, so no need to pass it along
+          } else {
+            set(attributes, mapping.hull, {
+              value: result,
+              operation: mapping.overwrite === false ? "setIfNull" : "set",
+            });
+          }
+        }
+      },
+    );
+
+    // Set the operational attributes
+    const lastRunTimestamp = isNil(params.executionTime)
+      ? DateTime.utc().toISO()
+      : params.executionTime;
+    set(
+      attributes,
+      `semrush/${params.analyticsType}_lastrun_at`,
+      lastRunTimestamp,
+    );
+
+    result.push({
+      hullOperation: "traits",
+      hullOperationParams: [attributes],
+      hullScope: "asAccount",
+      ident,
+    });
+
+    return result;
+  }
+
   private mapOutgoingTrafficSummary(
     params: Schema$MapOutgoingParameters,
   ): {
@@ -336,6 +413,65 @@ export class MappingUtil {
             export_columns: ["category_name", "rating"],
             target: get(envelope, "message.account.domain"),
             target_type: "root_domain",
+          },
+        ],
+      });
+    });
+
+    return result;
+  }
+
+  private mapOutgoingDomainRanks<T>(
+    params: Schema$MapOutgoingParameters,
+  ): {
+    params: semrush_v3.Schema$DomainRankRequest[];
+    envelopes: Schema$OutgoingOperationEnvelope<
+      IHullAccountUpdateMessage,
+      unknown
+    >[];
+  }[] {
+    const result: {
+      params: semrush_v3.Schema$DomainRankRequest[];
+      envelopes: Schema$OutgoingOperationEnvelope<
+        IHullAccountUpdateMessage,
+        unknown
+      >[];
+    }[] = [];
+
+    forEach(params.envelopes, (envelope) => {
+      result.push({
+        envelopes: [
+          envelope as Schema$OutgoingOperationEnvelope<
+            IHullAccountUpdateMessage,
+            unknown
+          >,
+        ],
+        params: [
+          {
+            export_columns: [
+              "Db",
+              "Dt",
+              "Dn",
+              "Rk",
+              "Or",
+              "Ot",
+              "Oc",
+              "Ad",
+              "At",
+              "Ac",
+              "Sh",
+              "Sv",
+              "FKn",
+              "FPn",
+            ],
+            database: this.appSettings.account_lookup_database_domain_ranks
+              ? get(
+                  envelope.message.account,
+                  this.appSettings.account_lookup_database_domain_ranks,
+                  null,
+                )
+              : null,
+            domain: get(envelope.message.account, "domain"),
           },
         ],
       });

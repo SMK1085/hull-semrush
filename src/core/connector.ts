@@ -16,6 +16,18 @@ export interface Schema$PrivateSettings {
    */
   account_attributes_incoming_traffic_summary: HullConnectorAttributeMapping[];
   /**
+   * The segments to use with the domain ranks API for accounts
+   */
+  account_synchronized_segments_domain_ranks: string[];
+  /**
+   * The mapping for incoming account attributes
+   */
+  account_attributes_incoming_domain_ranks: HullConnectorAttributeMapping[];
+  /**
+   * The lookup attribute for the database
+   */
+  account_lookup_database_domain_ranks?: string | null;
+  /**
    * The segments to use with the callback links API for accounts
    */
   account_synchronized_segments_backlinks_categories: string[];
@@ -23,7 +35,6 @@ export interface Schema$PrivateSettings {
    * The mapping for incoming account attributes
    */
   account_attributes_incoming_backlinks_categories: HullConnectorAttributeMapping[];
-
   /**
    * Defines whether the backlinks_categories report should run on batch or not.
    */
@@ -32,6 +43,11 @@ export interface Schema$PrivateSettings {
    * Defines whether the traffic_summary report should run on batch or not.
    */
   batch_enabled_traffic_summary?: boolean;
+
+  /**
+   * Defines whether the domain_ranks report should run on batch or not.
+   */
+  batch_enabled_domain_ranks?: boolean;
 }
 
 export interface Schema$LogPayload {
@@ -50,7 +66,8 @@ export interface Schema$LogPayload {
 
 export type Type$SupportedAnalyticsType =
   | "backlinks_categories"
-  | "traffic_summary";
+  | "traffic_summary"
+  | "domain_ranks";
 
 export interface Schema$MapIncomingParameters {
   data: unknown;
@@ -200,5 +217,59 @@ export const MAPPING_BACKLINKSCATEGORIES_V3: {
   {
     value: "categories",
     label: "Categories detailed",
+  },
+];
+
+export const MAPPING_DOMAINRANKS_V3: {
+  value: string;
+  label: string;
+}[] = [
+  {
+    value: "Database", // Db
+    label: "Categories names",
+  },
+  {
+    value: "Date", // Dt
+    label: "Categories detailed",
+  },
+  {
+    value: "Domain", //Dn
+    label: "Domain",
+  },
+  {
+    value: "Rank", // Rk
+    label: "Rank",
+  },
+  {
+    value: "Organic Keywords", // Or
+    label: "Organic Keywords",
+  },
+  {
+    value: "Organic Traffic", // Ot
+    label: "Organic Traffic",
+  },
+  {
+    value: "Organic Cost", // Oc
+    label: "Organic Cost",
+  },
+  {
+    value: "Adwords Keywords", // Ad
+    label: "Adwords Keywords",
+  },
+  {
+    value: "Adwords Traffic", // At
+    label: "Adwords Traffic",
+  },
+  {
+    value: "Adwords Cost", // Ac
+    label: "Adwords Cost",
+  },
+  {
+    value: "PLA keywords", // Sh
+    label: "PLA Keywords",
+  },
+  {
+    value: "PLA uniques", //Sv
+    label: "PLA Uniques",
   },
 ];

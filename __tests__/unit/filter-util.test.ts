@@ -21,8 +21,10 @@ describe("FilterUtil", () => {
       // Arrange
       const hullAppSettings: Schema$PrivateSettings = {
         account_attributes_incoming_backlinks_categories: [],
+        account_attributes_incoming_domain_ranks: [],
         account_attributes_incoming_traffic_summary: [],
         account_synchronized_segments_backlinks_categories: [],
+        account_synchronized_segments_domain_ranks: [],
         account_synchronized_segments_traffic_summary: [],
       };
       const opts = {
@@ -56,8 +58,10 @@ describe("FilterUtil", () => {
           );
           const hullAppSettings: Schema$PrivateSettings = {
             account_attributes_incoming_backlinks_categories: [],
+            account_attributes_incoming_domain_ranks: [],
             account_attributes_incoming_traffic_summary: [],
             account_synchronized_segments_backlinks_categories: [],
+            account_synchronized_segments_domain_ranks: [],
             account_synchronized_segments_traffic_summary: [],
           };
           const opts = {
@@ -90,8 +94,10 @@ describe("FilterUtil", () => {
           );
           const hullAppSettings: Schema$PrivateSettings = {
             account_attributes_incoming_backlinks_categories: [],
+            account_attributes_incoming_domain_ranks: [],
             account_attributes_incoming_traffic_summary: [],
             account_synchronized_segments_backlinks_categories: [],
+            account_synchronized_segments_domain_ranks: [],
             account_synchronized_segments_traffic_summary: [],
           };
           const opts = {
@@ -124,8 +130,10 @@ describe("FilterUtil", () => {
           );
           const hullAppSettings: Schema$PrivateSettings = {
             account_attributes_incoming_backlinks_categories: [],
+            account_attributes_incoming_domain_ranks: [],
             account_attributes_incoming_traffic_summary: [],
             account_synchronized_segments_backlinks_categories: [],
+            account_synchronized_segments_domain_ranks: [],
             account_synchronized_segments_traffic_summary: [],
           };
           set(hullAppSettings, `batch_enabled_${analyticsType}`, true);
@@ -161,8 +169,10 @@ describe("FilterUtil", () => {
           );
           const hullAppSettings: Schema$PrivateSettings = {
             account_attributes_incoming_backlinks_categories: [],
+            account_attributes_incoming_domain_ranks: [],
             account_attributes_incoming_traffic_summary: [],
             account_synchronized_segments_backlinks_categories: [],
+            account_synchronized_segments_domain_ranks: [],
             account_synchronized_segments_traffic_summary: [],
           };
           set(
@@ -204,8 +214,10 @@ describe("FilterUtil", () => {
           );
           const hullAppSettings: Schema$PrivateSettings = {
             account_attributes_incoming_backlinks_categories: [],
+            account_attributes_incoming_domain_ranks: [],
             account_attributes_incoming_traffic_summary: [],
             account_synchronized_segments_backlinks_categories: [],
+            account_synchronized_segments_domain_ranks: [],
             account_synchronized_segments_traffic_summary: [],
           };
           set(

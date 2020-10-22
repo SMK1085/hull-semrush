@@ -7,7 +7,7 @@ import axios, { AxiosError } from "axios";
 import { ApiUtil } from "../utils/api-util";
 import { parse } from "papaparse";
 import qs from "querystring";
-import { pickBy, identity, forEach } from "lodash";
+import { pickBy, identity, forEach, isNil } from "lodash";
 
 const API_BASE = "https://api.semrush.com";
 
@@ -81,6 +81,38 @@ export class ServiceClient {
         this.parseCsvResponse<semrush_v3.Schema$BacklinksCategories>(
           response.data,
         ),
+      );
+    } catch (error) {
+      return ApiUtil.handleApiResultError(url, method, params, error);
+    }
+  }
+
+  public async runDomainRanksReport(
+    params: semrush_v3.Schema$DomainRankRequest,
+  ): Promise<
+    Schema$ApiResultObject<
+      semrush_v3.Schema$DomainRankRequest,
+      semrush_v3.Schema$DomainRank[],
+      AxiosError
+    >
+  > {
+    const url = `${API_BASE}/?${this.createQueryString("domain_ranks", {
+      ...params,
+      export_columns: params.export_columns
+        ? params.export_columns.join(",")
+        : null,
+      database: isNil(params.database) ? null : params.database.toLowerCase(),
+    })}`;
+    const method: Type$ApiMethod = "get";
+
+    try {
+      const response = await axios.get<string>(url);
+      console.log(">> Domain ranks data", response.data);
+      return ApiUtil.handleApiResultSuccess(
+        url,
+        method,
+        params,
+        this.parseCsvResponse<semrush_v3.Schema$DomainRank>(response.data),
       );
     } catch (error) {
       return ApiUtil.handleApiResultError(url, method, params, error);

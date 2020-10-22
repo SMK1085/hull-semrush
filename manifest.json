@@ -211,6 +211,91 @@
       "description": "Run the backlinks categories report on batch operations",
       "type": "boolean",
       "default": false
+    },
+    {
+      "name": "account_synchronized_segments_domain_ranks",
+      "title": "Account Filter Domain Ranks",
+      "description": "Enrich Hull Accounts when they are part of one of these segments.",
+      "type": "array",
+      "format": "accountSegment",
+      "default": []
+    },
+    {
+      "name": "account_lookup_database_domain_ranks",
+      "title": "Database",
+      "description": "Select the account attribute which specifies the database. If this field is empty, data will be retrieved from all databases of Semrush.",
+      "type": "string",
+      "format": "accountTrait"
+    },
+    {
+      "name": "account_attributes_incoming_domain_ranks",
+      "title": "Incoming Mapping",
+      "description": "Define the enriched fields to store on the Hull Account profile.",
+      "type": "array",
+      "format": "accountTraitMapping",
+      "options": {
+        "direction": "incoming",
+        "showOverwriteToggle": true,
+        "placeholder": "Semrush Field",
+        "allowCreate": true,
+        "loadOptions": "/meta/fields/domain_ranks/incoming",
+        "source": "semrush"
+      },
+      "default": [
+        {
+          "hull": "semrush/database",
+          "overwrite": true,
+          "readOnly": true,
+          "service": "Database"
+        }, {
+          "hull": "semrush/domain",
+          "overwrite": true,
+          "service": "Domain"
+        }, {
+          "hull": "semrush/rank",
+          "overwrite": true,
+          "service": "Rank"
+        }, {
+          "hull": "semrush/organic_keywords",
+          "overwrite": true,
+          "service": "Organic Keywords"
+        },{
+          "hull": "semrush/organic_traffic",
+          "overwrite": true,
+          "service": "Organic Traffic"
+        },{
+          "hull": "semrush/organic_cost",
+          "overwrite": true,
+          "service": "Organic Cost"
+        }, {
+          "hull": "semrush/adwords_keywords",
+          "overwrite": true,
+          "service": "Adwords Keywords"
+        },{
+          "hull": "semrush/adwords_traffic",
+          "overwrite": true,
+          "service": "Adwords Traffic"
+        },{
+          "hull": "semrush/adwords_cost",
+          "overwrite": true,
+          "service": "Adwords Cost"
+        }, {
+          "hull": "semrush/pla_keywords",
+          "overwrite": true,
+          "service": "PLA keywords"
+        },{
+          "hull": "semrush/pla_uniques",
+          "overwrite": true,
+          "service": "PLA uniques"
+        }
+      ]
+    },
+    {
+      "name": "batch_enabled_domain_ranks",
+      "title": "Enable for batch",
+      "description": "Run the domain ranks report on batch operations",
+      "type": "boolean",
+      "default": false
     }
   ],
   "json": [],
@@ -228,7 +313,8 @@
       "segments": {
         "account:update": [
           "private_settings.account_synchronized_segments_traffic_summary",
-          "private_settings.account_synchronized_segments_backlinks_categories"
+          "private_settings.account_synchronized_segments_backlinks_categories",
+          "private_settings.account_synchronized_segments_domain_ranks"
         ]
       }
     },
@@ -249,6 +335,16 @@
         "private_settings.account_synchronized_segments_traffic_summary",
         "private_settings.account_attributes_incoming_traffic_summary",
         "private_settings.batch_enabled_traffic_summary"
+      ]
+    },
+    {
+      "title": "Domain Ranks",
+      "description": "Define which accounts are analyzed with the domain ranks report.",
+      "properties": [
+        "private_settings.account_synchronized_segments_domain_ranks",
+        "private_settings.account_lookup_database_domain_ranks",
+        "private_settings.account_attributes_incoming_domain_ranks",
+        "private_settings.batch_enabled_domain_ranks"
       ]
     },
     {

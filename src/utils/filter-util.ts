@@ -35,6 +35,7 @@ export class FilterUtil {
       backlinks_categories: this.filterAccountMessagesBacklinksCategories.bind(
         this,
       ),
+      domain_ranks: this.filterAccountMessagesDomainRanks.bind(this),
     };
   }
 
@@ -162,6 +163,68 @@ export class FilterUtil {
               VALIDATION_SKIP_HULLACCOUNT_BATCHNOTENABLED(
                 "backlinks_categories",
               ),
+            ],
+            objectType: "account",
+          });
+        } else {
+          result.analytics.push({
+            message: msg,
+            operation: "analytics",
+            objectType: "account",
+          });
+        }
+      }
+    });
+
+    return result;
+  }
+
+  private filterAccountMessagesDomainRanks(
+    messages: IHullAccountUpdateMessage[],
+    isBatch: boolean = false,
+  ): Schema$OutgoingOperationEnvelopesFiltered<
+    IHullAccountUpdateMessage,
+    semrush_v3.Schema$DomainRankRequest
+  > {
+    const result: Schema$OutgoingOperationEnvelopesFiltered<
+      IHullAccountUpdateMessage,
+      semrush_v3.Schema$DomainRankRequest
+    > = {
+      analytics: [],
+      skips: [],
+    };
+
+    messages.forEach((msg) => {
+      if (
+        !isBatch &&
+        !FilterUtil.isInAnySegment(
+          msg.account_segments,
+          this.appSettings.account_synchronized_segments_domain_ranks || [],
+        )
+      ) {
+        result.skips.push({
+          message: msg,
+          operation: "skip",
+          notes: [VALIDATION_SKIP_HULLOBJECT_NOTINANYSEGMENT("account")],
+          objectType: "account",
+        });
+      } else {
+        if (isNil(get(msg, "account.domain", null))) {
+          result.skips.push({
+            message: msg,
+            operation: "skip",
+            notes: [VALIDATION_SKIP_HULLACCOUNT_NODOMAIN],
+            objectType: "account",
+          });
+        } else if (
+          get(this.appSettings, "batch_enabled_domain_ranks", false) !== true &&
+          isBatch === true
+        ) {
+          result.skips.push({
+            message: msg,
+            operation: "skip",
+            notes: [
+              VALIDATION_SKIP_HULLACCOUNT_BATCHNOTENABLED("domain_ranks"),
             ],
             objectType: "account",
           });

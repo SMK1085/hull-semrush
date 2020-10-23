@@ -203,6 +203,12 @@ export class SyncAgent {
                 console.log(">> Mapped results", mappedResults);
                 await hullUtil.processIncomingData(mappedResults);
               } else {
+                const mappedErrors = mappingUtil.mapIncomingError({
+                  analyticsType,
+                  error: [apiResult.errorDetails as Error],
+                  hullData: requestParams.envelopes,
+                });
+                await hullUtil.processIncomingData(mappedErrors);
                 await Promise.all(
                   requestParams.envelopes.map((envelope) =>
                     hullClient

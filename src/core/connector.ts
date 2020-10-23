@@ -77,6 +77,14 @@ export interface Schema$MapIncomingParameters {
   executionTime?: string;
 }
 
+export interface Schema$MapIncomingErrorParameters {
+  error: Error[];
+  analyticsType: Type$SupportedAnalyticsType;
+  [key: string]: unknown;
+  hullData: unknown;
+  executionTime?: string;
+}
+
 export interface Schema$MapIncomingResult {
   ident: unknown;
   hullScope: "asUser" | "asAccount";

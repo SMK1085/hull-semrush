@@ -315,6 +315,7 @@ describe("MappingUtil", () => {
             },
           };
           set(attribs, `semrush/${analyticsType}_lastrun_at`, executionTime);
+          set(attribs, `semrush/${analyticsType}_error`, null);
           return {
             ident,
             hullOperation: "traits",

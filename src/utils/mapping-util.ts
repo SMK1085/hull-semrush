@@ -5,6 +5,7 @@ import {
   Schema$MapIncomingResult,
   Schema$MapOutgoingParameters,
   Schema$OutgoingOperationEnvelope,
+  Schema$MapIncomingErrorParameters,
 } from "../core/connector";
 import { semrush_v3 } from "../core/service-objects";
 import IHullAccountUpdateMessage from "../types/account-update-message";
@@ -17,6 +18,11 @@ export class MappingUtil {
   public readonly registeredOperationsIncoming: {
     [key: string]: (
       params: Schema$MapIncomingParameters,
+    ) => Schema$MapIncomingResult[];
+  };
+  public readonly registeredOperationsIncomingError: {
+    [key: string]: (
+      params: Schema$MapIncomingErrorParameters,
     ) => Schema$MapIncomingResult[];
   };
   public readonly registeredOperationsOutgoing: {
@@ -39,6 +45,11 @@ export class MappingUtil {
       traffic_summary: this.mapIncomingTrafficSummary.bind(this),
       backlinks_categories: this.mapIncomingBacklinksCategories.bind(this),
       domain_ranks: this.mapIncomingDomainRanks.bind(this),
+    };
+    this.registeredOperationsIncomingError = {
+      traffic_summary: this.mapIncomingErrorTrafficSummary.bind(this),
+      backlinks_categories: this.mapIncomingErrorBacklinksCategories.bind(this),
+      domain_ranks: this.mapIncomingErrorDomainRanks.bind(this),
     };
     this.registeredOperationsOutgoing = {
       traffic_summary: this.mapOutgoingTrafficSummary.bind(this),
@@ -65,6 +76,26 @@ export class MappingUtil {
     }
 
     return this.registeredOperationsIncoming[params.analyticsType](params);
+  }
+
+  public mapIncomingError(
+    params: Schema$MapIncomingErrorParameters,
+  ): Schema$MapIncomingResult[] {
+    if (
+      !Object.keys(this.registeredOperationsIncoming).includes(
+        params.analyticsType,
+      )
+    ) {
+      throw new Error(
+        `Analytics type '${
+          params.analyticsType
+        }' is not registered. Allowed types are ${Object.keys(
+          this.registeredOperationsIncoming,
+        ).join(", ")}.`,
+      );
+    }
+
+    return this.registeredOperationsIncomingError[params.analyticsType](params);
   }
 
   public mapOutgoing(
@@ -185,6 +216,67 @@ export class MappingUtil {
         `semrush/${params.analyticsType}_lastrun_at`,
         lastRunTimestamp,
       );
+      set(attributes, `semrush/${params.analyticsType}_error`, null);
+
+      result.push({
+        hullOperation: "traits",
+        hullOperationParams: [attributes],
+        hullScope: "asAccount",
+        ident,
+      });
+    });
+
+    return result;
+  }
+
+  private mapIncomingErrorTrafficSummary(
+    params: Schema$MapIncomingErrorParameters,
+  ): Schema$MapIncomingResult[] {
+    const result: Schema$MapIncomingResult[] = [];
+    const envelopes = params.hullData as Schema$OutgoingOperationEnvelope<
+      IHullAccountUpdateMessage,
+      unknown
+    >[];
+
+    envelopes.forEach((envelope, index) => {
+      const ident = pick(envelope.message.account, [
+        "id",
+        "external_id",
+        "domain",
+      ]);
+      if (
+        (get(envelope.message.account, "anonymous_ids", []) as string[])
+          .length > 0
+      ) {
+        set(
+          ident,
+          "anonymous_id",
+          first(get(envelope.message.account, "anonymous_ids", []) as string[]),
+        );
+      }
+      const attributes = {};
+      // Set the operational attributes
+      const lastRunTimestamp = isNil(params.executionTime)
+        ? DateTime.utc().toISO()
+        : params.executionTime;
+      set(
+        attributes,
+        `semrush/${params.analyticsType}_lastrun_at`,
+        lastRunTimestamp,
+      );
+      if (params.error.length >= index) {
+        set(
+          attributes,
+          `semrush/${params.analyticsType}_error`,
+          params.error[index].message,
+        );
+      } else {
+        set(
+          attributes,
+          `semrush/${params.analyticsType}_error`,
+          "Unknown error",
+        );
+      }
 
       result.push({
         hullOperation: "traits",
@@ -261,6 +353,63 @@ export class MappingUtil {
       `semrush/${params.analyticsType}_lastrun_at`,
       lastRunTimestamp,
     );
+    set(attributes, `semrush/${params.analyticsType}_error`, null);
+
+    result.push({
+      hullOperation: "traits",
+      hullOperationParams: [attributes],
+      hullScope: "asAccount",
+      ident,
+    });
+
+    return result;
+  }
+
+  private mapIncomingErrorBacklinksCategories(
+    params: Schema$MapIncomingErrorParameters,
+  ): Schema$MapIncomingResult[] {
+    const result: Schema$MapIncomingResult[] = [];
+
+    const envelope = first(
+      params.hullData as any[],
+    ) as Schema$OutgoingOperationEnvelope<IHullAccountUpdateMessage, unknown>;
+
+    const ident = pick(envelope.message.account, [
+      "id",
+      "external_id",
+      "domain",
+    ]);
+    if (
+      (get(envelope.message.account, "anonymous_ids", []) as string[]).length >
+      0
+    ) {
+      set(
+        ident,
+        "anonymous_id",
+        first(get(envelope.message.account, "anonymous_ids", []) as string[]),
+      );
+    }
+    const attributes = {};
+
+    // Set the operational attributes
+    const lastRunTimestamp = isNil(params.executionTime)
+      ? DateTime.utc().toISO()
+      : params.executionTime;
+    set(
+      attributes,
+      `semrush/${params.analyticsType}_lastrun_at`,
+      lastRunTimestamp,
+    );
+    const errorDetails = first(params.error);
+    if (!isNil(errorDetails)) {
+      set(
+        attributes,
+        `semrush/${params.analyticsType}_error`,
+        errorDetails.message,
+      );
+    } else {
+      set(attributes, `semrush/${params.analyticsType}_error`, "Unknown error");
+    }
 
     result.push({
       hullOperation: "traits",
@@ -336,6 +485,63 @@ export class MappingUtil {
       `semrush/${params.analyticsType}_lastrun_at`,
       lastRunTimestamp,
     );
+    set(attributes, `semrush/${params.analyticsType}_error`, null);
+
+    result.push({
+      hullOperation: "traits",
+      hullOperationParams: [attributes],
+      hullScope: "asAccount",
+      ident,
+    });
+
+    return result;
+  }
+
+  private mapIncomingErrorDomainRanks(
+    params: Schema$MapIncomingErrorParameters,
+  ): Schema$MapIncomingResult[] {
+    const result: Schema$MapIncomingResult[] = [];
+
+    const envelope = first(
+      params.hullData as any[],
+    ) as Schema$OutgoingOperationEnvelope<IHullAccountUpdateMessage, unknown>;
+
+    const ident = pick(envelope.message.account, [
+      "id",
+      "external_id",
+      "domain",
+    ]);
+    if (
+      (get(envelope.message.account, "anonymous_ids", []) as string[]).length >
+      0
+    ) {
+      set(
+        ident,
+        "anonymous_id",
+        first(get(envelope.message.account, "anonymous_ids", []) as string[]),
+      );
+    }
+    const attributes = {};
+
+    // Set the operational attributes
+    const lastRunTimestamp = isNil(params.executionTime)
+      ? DateTime.utc().toISO()
+      : params.executionTime;
+    set(
+      attributes,
+      `semrush/${params.analyticsType}_lastrun_at`,
+      lastRunTimestamp,
+    );
+    const errorDetails = first(params.error);
+    if (!isNil(errorDetails)) {
+      set(
+        attributes,
+        `semrush/${params.analyticsType}_error`,
+        errorDetails.message,
+      );
+    } else {
+      set(attributes, `semrush/${params.analyticsType}_error`, "Unknown error");
+    }
 
     result.push({
       hullOperation: "traits",
